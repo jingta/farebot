@@ -22,6 +22,9 @@
 
 package com.codebutler.farebot.activities;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -36,6 +39,7 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.UnsupportedTagException;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.cepas.CEPASCard;
+import com.codebutler.farebot.mifare.ClassicCard;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.MifareCard;
 import com.codebutler.farebot.provider.CardProvider;
@@ -75,7 +79,10 @@ public class ReadingTagActivity extends Activity
                 @Override
                 protected MifareCard doInBackground (Void... params) {
                     try {
-                    	if (ArrayUtils.contains(techs, "android.nfc.tech.NfcB"))
+                    	if (ArrayUtils.contains(techs, "android.nfc.tech.MifareClassic")) {
+                    		return ClassicCard.dumpTag(tag.getId(), tag);
+                    	}
+                    	else if (ArrayUtils.contains(techs, "android.nfc.tech.NfcB"))
                     		return CEPASCard.dumpTag(tag.getId(), tag);
                     	else if (ArrayUtils.contains(techs, "android.nfc.tech.IsoDep"))
                             return DesfireCard.dumpTag(tag.getId(), tag);
