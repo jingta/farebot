@@ -32,6 +32,10 @@ public class ClassicCard extends MifareCard {
         	// Dump card data
         	Logger l = Logger.getLogger("MifareClassicCardInfo");
         	l.log(Level.INFO, "MifareCard");
+        	l.log(Level.INFO, "TAG ID:");
+        	for (byte b : tech.getTag().getId()) {
+        		l.log(Level.INFO, Byte.toString(b));
+        	}
         	l.log(Level.INFO, "Blocks: " + tech.getBlockCount());
         	l.log(Level.INFO, "Sectors: " + tech.getSectorCount());
         	l.log(Level.INFO, "Size: " + tech.getSize());
@@ -50,14 +54,15 @@ public class ClassicCard extends MifareCard {
            int blockIndex = 0;
            for(int j = 0; j < tech.getSectorCount(); j++){
         	   // authenticate the sector
-        	   if(tech.authenticateSectorWithKeyA(j, MifareClassic.KEY_MIFARE_APPLICATION_DIRECTORY)){//MifareClassic.KEY_NFC_FORUM)){//MifareClassic.KEY_DEFAULT)){
+        	   if(tech.authenticateSectorWithKeyA(j, MifareClassic.KEY_DEFAULT) || 
+        			   tech.authenticateSectorWithKeyA(j, MifareClassic.KEY_MIFARE_APPLICATION_DIRECTORY)){//MifareClassic.KEY_NFC_FORUM)){//MifareClassic.KEY_DEFAULT)){
         		   blockCount = tech.getBlockCountInSector(j);
         		   for(int i = 0; i < blockCount; i++){
-        			   blockIndex = tech.sectorToBlock(j);
-        			   byte[] data = tech.readBlock(blockIndex);    
+        			   //blockIndex = tech.sectorToBlock(j);
+        			   byte[] data = tech.readBlock(i);    
         			   // 7) Convert the data into a string from Hex format.
         			   l.info(toHex(data));
-        			   blockIndex++;
+        			   //blockIndex++;
         		   }
         	   }else{ // Authentication failed - Handle it
         		   l.info("Auth failed on sector " + j);
@@ -82,14 +87,6 @@ public class ClassicCard extends MifareCard {
 	    return String.format("%0" + (bytes.length << 1) + "x", bi);
 	}
 	
-	/* (non-Javadoc)
-	 * @see android.os.Parcelable#describeContents()
-	 */
-	@Override
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	/* (non-Javadoc)
 	 * @see com.codebutler.farebot.mifare.MifareCard#getCardType()
@@ -97,6 +94,14 @@ public class ClassicCard extends MifareCard {
 	@Override
 	public CardType getCardType() {
 		return CardType.MifareClassic;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.os.Parcelable#describeContents()
+	 */
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
