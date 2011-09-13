@@ -50,30 +50,18 @@ public class ClassicCard extends MifareCard {
         	l.log(Level.INFO, "TypeString: " + type);
         	l.log(Level.INFO, "Connected: " + tech.isConnected());
         	
-           int blockCount = 0;
-           int blockIndex = 0;
-           for(int j = 0; j < tech.getSectorCount(); j++){
-        	   // authenticate the sector
-        	   if(tech.authenticateSectorWithKeyA(j, MifareClassic.KEY_DEFAULT) || 
-        			   tech.authenticateSectorWithKeyA(j, MifareClassic.KEY_MIFARE_APPLICATION_DIRECTORY)){//MifareClassic.KEY_NFC_FORUM)){//MifareClassic.KEY_DEFAULT)){
-        		   blockCount = tech.getBlockCountInSector(j);
-        		   for(int i = 0; i < blockCount; i++){
-        			   //blockIndex = tech.sectorToBlock(j);
-        			   byte[] data = tech.readBlock(i);    
-        			   // 7) Convert the data into a string from Hex format.
-        			   l.info(toHex(data));
-        			   //blockIndex++;
-        		   }
-        	   }else{ // Authentication failed - Handle it
-        		   l.info("Auth failed on sector " + j);
-        		   //TODO: get keys
-        		   
-        	   }
-           }
         	
-        	for (int i = 0; i < tech.getBlockCount(); i ++){
-        		l.log(Level.INFO, "Block " + i + ": " + tech.readBlock(i));
+
+        	if (tech.authenticateSectorWithKeyA(0, MifareClassic.KEY_DEFAULT)) {
+        		// read out data from first block (with id)
+        		byte[] data = tech.readBlock(0);
+        		// Convert the data into a string from Hex format.
+    			l.info(toHex(data));
+        	} else {
+        		l.info("Auth failed reading entry block");
         	}
+        		
+			
         } finally {
             if (tech.isConnected())
                 tech.close();
